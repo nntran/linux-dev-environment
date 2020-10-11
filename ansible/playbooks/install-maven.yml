@@ -1,0 +1,25 @@
+# Playbook for installing Maven on all hosts
+# File name: install-maven.yml
+# https://fedoramagazine.org/add-power-terminal-powerline/
+---
+- name: Install Maven on all hosts
+  hosts: all # Change this setting to you hosts or group specified in /etc/ansible/hosts
+  become: true
+  # remote_user: root
+  # Thi variables file is used
+  vars_files:
+    - ../vars.yml
+  tasks:
+    - name: Download Apache Maven
+      get_url: url=https://mirror.ibcp.fr/pub/apache/maven/maven-3/{{ vm.packages.maven.version }}/binaries/apache-maven-{{ vm.packages.maven.version }}-bin.tar.gz dest=/tmp/apache-maven-{{ vm.packages.maven.version }}-bin.tar.gz
+
+    - name: Untar Maven
+      shell: chdir=/tmp creates=/opt/apache-maven-{{ vm.packages.maven.version }} tar -zxf apache-maven-{{ vm.packages.maven.version }}-bin.tar.gz -C /opt
+
+    - name: Update path for Maven use
+      blockinfile:
+        #path: /etc/bash.bashrc
+        path: "/home/{{ansible_user}}/.bashrc"
+        create: yes
+        block: |
+          export PATH=$PATH:/opt/apache-maven-{{ vm.packages.maven.version }}/bin

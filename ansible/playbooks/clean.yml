@@ -1,0 +1,27 @@
+# Playbook for removing useless packages and dependencieson all hosts
+# File name: clean.yml
+---
+- name: Remove useless packages and dependencies, ...
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Remove useless packages from the cache
+      apt:
+        autoclean: yes
+
+    - name: Remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
+    - name: Remove the vagrant user
+      become: true
+      #become_method: su
+      become_user: ntran
+      #become_flags: "-s /bin/sh"
+      user:
+        name: vagrant
+        state: absent
+        remove: yes
+      # https://docs.ansible.com/ansible/2.3/become.html#:~:text=Ansible%20allows%20you%20to%20'become,%2C%20dzdo%20%2C%20ksu%20and%20others.

@@ -1,0 +1,64 @@
+# Playbook for installing Java and dependencies on all hosts
+# File name: install-svcode.yml
+# https://fedoramagazine.org/add-power-terminal-powerline/
+---
+- name: Install Java and dependencies on all hosts
+  hosts: all # Change this setting to you hosts or group specified in /etc/ansible/hosts
+  become: true
+  # remote_user: root
+  # Thi variables file is used
+  vars_files:
+    - ../vars.yml
+  tasks:
+    - name: Install dependencies
+      apt: name={{item}} state=latest
+      with_items:
+        - software-properties-common
+        - dirmngr
+
+    - name: Install add-apt-repostory
+      apt: name=software-properties-common state=latest
+
+    - name: Add Oracle Java Repository
+      apt_repository:
+        repo: deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
+        state: present
+
+    - name: Add an apt key by id from a keyserver
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: EEA14886
+
+    - name: Accept Java {{ vm.packages.java.version }} License
+      debconf: name='oracle-java{{ vm.packages.java.version }}-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+
+    - name: Update cache and ignore errors in case of problems
+      apt: update_cache=yes
+      ignore_errors: yes
+
+    - name: Purge java {{ vm.packages.java.version }} installer - to avoid problems if installation is repeated
+      apt:
+        name: oracle-java{{ vm.packages.java.version }}-installer
+        state: absent
+
+    - name: Install Oracle Java {{ vm.packages.java.version }}
+      apt: name={{item}} state=latest
+      with_items:
+        - ca-certificates
+        - oracle-java{{ vm.packages.java.version }}-installer
+        - oracle-java{{ vm.packages.java.version }}-set-default
+    # - name: Install add-apt-repostory
+    #   apt: name=software-properties-common state=latest
+    # - name: Add Oracle Java Repository
+    #   apt_repository: repo='ppa:webupd8team/java'
+    # - name: Accept Java {{ vm.packages.java.version }} License
+    #   debconf: name='oracle-java{{ vm.packages.java.version }}-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+    # - name: Install Oracle Java {{ vm.packages.java.version }}
+    #   apt:
+    #     name: "{{ java }}"
+    #     state: latest
+    #   vars:
+    #     java:
+    #       - oracle-java{{ vm.packages.java.version }}-installer
+    #       - ca-certificates
+    #       - oracle-java8-set-default

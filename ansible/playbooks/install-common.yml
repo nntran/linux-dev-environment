@@ -1,0 +1,38 @@
+# Playbook for installing common packages on all hosts
+# File name: install-common.yml
+---
+- name: Install base packages on all hosts
+  hosts: all
+  become: true
+  # remote_user: root
+
+  tasks:
+    - name: Install common dependencies
+      apt:
+        name:
+          - ca-certificates
+          - apt-transport-https
+          - software-properties-common
+          - net-tools
+          - jshon
+          - gnupg2
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: Install compilers
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - gcc
+          - g++
+          - make
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+        # update_cache: yes

@@ -1,0 +1,32 @@
+{
+  "servers": [
+    {
+      "host": "192.168.5.220",
+      "ssh_port": "22",
+      "username": "tran",
+      "password": "tran@SystelF5",
+      "network": "Systel PREPROD Network",
+      "datastore": "datastore-VM",
+      "nameservers": "172.18.0.5,172.18.0.6,8.8.8.8,8.8.4.4",
+      "gateway": "192.168.9.254",
+      "nodes": [
+        {
+          "name": "vm-devops",
+          "type": "devops",
+          "ip": "192.168.9.150",
+          "memmory": "4096",
+          "cpus": "2",
+          "disk": "40",
+          "box": {
+            "name": "generic/ubuntu1804",
+            "version": "3.0.28"
+          },
+          "user": {
+            "name": "systel",
+            "password": "superlinux"
+          }
+        }
+      ]
+    }
+  ]
+}

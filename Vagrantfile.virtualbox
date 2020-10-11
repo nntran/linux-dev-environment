@@ -1,0 +1,188 @@
+# -*- mode: ruby -*-
+# # vi: set ft=ruby :
+
+# Specify minimum Vagrant version and Vagrant API version
+Vagrant.require_version '>= 2.2.4'
+VAGRANTFILE_API_VERSION = '2'
+
+# required_plugins = %w[vagrant-reload vagrant-persistent-storage vagrant-vbguest vagrant-proxyconf nugrant]
+# plugins_to_install = required_plugins.reject { |plugin| Vagrant.has_plugin? plugin }
+# unless plugins_to_install.empty?
+#   puts "Installing plugins: #{plugins_to_install.join(' ')}"
+#   if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+#     exec "vagrant #{ARGV.join(' ')}"
+#   else
+#     abort 'Installation of one or more plugins has failed. Aborting.'
+#   end
+# end
+
+# Require JSON module
+require 'json'
+require 'yaml'
+
+file_root = File.dirname(File.expand_path(__FILE__))
+vagrant_dir = __dir__
+
+# Read YAML file with box details
+provider = 'virtualbox'
+vm_config = JSON.parse(File.read(File.join(File.dirname(__FILE__), "config/config-#{provider}.json")))
+puts "JSON Config: #{vm_config}" 
+
+# # Admin account
+# admin = vm_config['admin']
+
+# Virtualization servers 
+servers = vm_config['servers']
+
+# # Read YAML file with box details
+# ansible_conf = YAML.load_file("config/packages.yml")
+# puts "Packages: #{ansible_conf}" 
+
+sync_dir = '/home/vagrant'
+
+#  Fully documented Vagrantfile available
+#  https://www.vagrantup.com/docs/vagrantfile/
+
+Vagrant.configure(2) do |config|
+
+    # Required these plugins
+    config.vagrant.plugins = [
+        "vagrant-hostmanager" => {"version" => "1.8.9"},
+        # "vagrant-reload" => {"version" => "0.0.1"},
+        # "vagrant-disksize"
+    ]
+
+    # If true, Vagrant will automatically insert a keypair to use for SSH, 
+    # replacing Vagrant's default insecure key inside the machine if detected. 
+    # By default, this is true.
+    # This only has an effect if you do not already use private keys for authentication 
+    # or if you are relying on the default insecure key. If you do not have to care about security 
+    # in your project and want to keep using the default insecure key, set this to false.
+    #config.ssh.insert_key = false
+
+    # If false, this setting will not include the compression setting 
+    # when ssh'ing into a machine. If this is not set, it will default to true 
+    # and Compression=yes will be enabled with ssh.
+    # config.ssh.compression=false
+
+    # If true, this setting SSH will send keep-alive packets every 5 seconds by default to keep connections alive.
+    #config.ssh.keep_alive = true
+
+    # The command to use when executing a command with sudo. 
+    # This defaults to sudo -E -H %c. The %c will be replaced by the command that is being executed.
+    # config.ssh.sudo_command = "sudo -E -H %c"
+
+    # Hostmanager Config
+    # Need to install the plugin vagrant-hostmanger
+    config.hostmanager.enabled = true
+    config.hostmanager.manage_host = false
+    config.hostmanager.manage_guest = true
+    config.hostmanager.ignore_private_ip = false
+    config.hostmanager.include_offline = true
+
+    # Server host
+    servers.each do |server|
+
+        # Cluster nodes (Virtual Machines) to create
+        nodes = server['nodes']
+
+        # Create cluster VM
+        nodes.each do |node|
+
+            config.vm.define node['name'] do |n|
+
+                # https://www.vagrantup.com/docs/vagrantfile/machine_settings.html
+                box = node['box']
+                n.vm.box = box['name']
+                n.vm.box_version = box['version']
+
+                # The URL that the configured box can be found at. 
+                # If config.vm.box is a shorthand to a box in HashiCorp's Vagrant Cloud 
+                # then this value does not need to be specified. Otherwise, it should point 
+                # to the proper place where the box can be found if it is not installed. 
+                # This can also be an array of multiple URLs. The URLs will be tried in order.
+                
+                # Note that any client certificates, insecure download settings, 
+                # and so on will apply to all URLs in this list. 
+                # The URLs can also be local files by using the file:// scheme. For example: "file:///tmp/test.box".
+                #n.vm.box_url = "http://repo.release.xxxxx.yyy/nexus/content/repositories/vagrant/com/xxxxx/vagrant/rhel73/1.0.0/rhel73-1.0.0.box"
+                
+                # If true, then SSL certificates from the server will not be verified. 
+                # By default, if the URL is an HTTPS URL, then SSL certs will be verified.
+                n.vm.box_download_insecure = true
+
+                n.vm.hostname = node['name']
+
+                # The time in seconds that Vagrant will wait for the machine to boot and be accessible. 
+                # By default this is 300 seconds.
+                n.vm.boot_timeout = 600
+                
+                # Networks
+                # https://www.vagrantup.com/docs/networking/private_network.html
+                #n.vm.network :private_network, ip: node['ip'], auto_config: false
+                n.vm.network :private_network, ip: node['ip']
+
+                # Set VM name in Virtualbox
+                config.vm.provider "virtualbox" do |vb|
+                    vb.name = node['name']
+                    vb.memory = node['memory']
+                    vb.cpus = node['cpus']
+                    
+                    # By default, VirtualBox machines are started in headless mode, meaning there is no UI for the machines visible on the host 
+                    # machine. Sometimes, you want to have a UI. Common use cases include wanting to see a browser that may be running in the 
+                    # machine, or debugging a strange boot issue. You can easily tell the VirtualBox provider to boot with a GUI:
+                    vb.gui = false
+                    
+                    # https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html
+                    vb.customize ["modifyvm", :id, "--groups", "/development"]
+                    #   # 1 monitor
+                    #   v.customize ["modifyvm", :id, "--monitorcount", "1"]
+                    #   # VM is modified to have a host CPU execution cap of 50%, 
+                    #   # meaning that no matter how much CPU is used in the VM, no more than 50% would be used on your own host machine
+                    #   v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+                    
+                    # Enable host desktop integration
+                    vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+                    vb.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+
+                    # Customize graphics settings
+                    vb.customize ["modifyvm", :id, "--vram", "64"]
+                    vb.customize ["modifyvm", :id, "--accelerate3d", "off"]
+
+                    # Enable sound
+                    #vb.customize ["modifyvm", :id, "--audio", default_vb_audio, "--audiocontroller", default_vb_audiocontroler]
+                end
+
+                # n.vm.provision "file", source: "config", destination: sync_dir + '/config'
+
+                # # Create user
+                # user = node['user']
+                # user_name = user['name']
+                # user_password = user['password']
+                # user_home = '/home/' + user['name']
+                # n.vm.provision "shell" do |shell|
+                #     shell.path = "scripts/create-user.sh"
+                #     shell.args = [user_name, user_password, user_home]
+                # end
+
+                # Force password change on first use
+                # n.vm.provision 'shell', inline: "chage --lastday 0 #{user_name}"
+
+                # Configuring network
+                # nameservers = server['nameservers']
+                # gateway = server['gateway']
+                # n.vm.provision "shell" do |s|
+                #     s.path = "scripts/configure-network.sh"
+                #     s.args = [provider, nameservers, gateway]
+                # end
+
+                # # Restart the VM after everything is installed
+                # # n.vm.provision :reload
+                # n.vm.provision :shell do |shell|
+                #     shell.privileged = true
+                #     shell.inline = 'sudo reboot'
+                # end
+            end
+        end
+    end
+end

@@ -1,0 +1,110 @@
+# Playbook for setting up locales, keyboard, ...
+# File name: configure.yml
+---
+- name: Set up all hosts (users, groups, locales, ...)
+  hosts: all
+  become: true
+  # remote_user: root
+
+  vars_files:
+    - ../vars.yml
+
+  tasks:
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html
+    - name: Add groups
+      group:
+        name: "{{ item.name }}"
+        gid: "{{ item.gid }}"
+        state: present
+      with_items: "{{ vm.groups }}"
+      when: vm.groups is defined
+
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
+    - name: Add users
+      user:
+        name: "{{ item.name }}"
+        comment: "{{ item.comment }}"
+        uid: "{{ item.uid }}"
+        password: "{{ item.password }}"
+        group: "{{ item.group }}"
+        groups: "{{ item.groups }}"
+        shell: "{{ item.shell }}"
+        generate_ssh_key: "{{ item.generate_ssh_key }}"
+        # add the user to the groups specified in groups
+        # append: true
+        state: present
+      with_items: "{{ vm.users }}"
+      when: vm.users is defined
+
+    # Install locales
+    - name: Install locales
+      apt:
+        name: locales
+        state: present
+        update_cache: yes
+
+    - name: Set up locale with {{ vm.locale.language.code | lower }}_{{ vm.locale.language.code | upper }} {{ vm.locale.encoding | upper }}
+      blockinfile:
+        path: /etc/locale.gen
+        # fr_FR UTF-8
+        block: |
+          {{ vm.locale.language.code | lower }}_{{ vm.locale.language.code | upper }} {{ vm.locale.encoding | upper }}
+
+    # Enable locales in /etc/locale.gen
+    # locale-gen fr_FR.UTF-8
+    # localectl set-locale LANG=fr_FR.UTF-8 LC_ALL=fr_FR.UTF-8
+    - name: Enable locales in /etc/locale.gen
+      shell: "locale-gen {{ vm.locale.language.code | lower }}_{{ vm.locale.language.code | upper }}.{{ vm.locale.encoding | upper }} && localectl set-locale LANG={{ vm.locale.language.code | lower }}_{{ vm.locale.language.code | upper }}.{{ vm.locale.encoding | upper }}"
+
+    # Set locale, this generates the /etc/default/locale file
+    # locale-gen fr_FR.UTF-8
+    # localectl set-locale LANG=fr_FR.UTF-8
+    - name: Set locale, this generates the /etc/default/locale file
+      shell: "update-locale LANG={{ vm.locale.language.code | lower }}_{{ vm.locale.language.code | upper }}.{{ vm.locale.encoding | upper }}"
+    # - name: Ensure the locale {{ locale.lang }}.{{ locale.encoding }} exists
+    #   locale_gen:
+    #     name: "{{ locale.lang }}.{{ locale.encoding }}"
+    #     state: present
+    # # Enable locales in /etc/locale.gen
+    # - name: Set as default locale
+    #   command: localectl set-locale LANG={{ locale.lang }}.{{ locale.encoding }} LC_ALL={{ locale.lang }}.{{ locale.encoding }}
+    # # Set locale, this generates the /etc/default/locale file
+    # - name: Set locale, this generates the /etc/default/locale file
+    #   command: update-locale LANG={{ locale.lang }}.{{ locale.encoding }}
+    # # Reconfigure, the current system language settings
+    # dpkg-reconfigure locales
+
+    # https://serverfault.com/questions/539911/setting-debconf-selections-for-keyboard-configuration-fails-layout-ends-up-as
+    - name: Set up keyboard
+      apt:
+        name:
+          - console-data
+          - console-setup
+          - keyboard-configuration
+        state: present
+        update_cache: yes
+        # Do this manually after reboot (for MacOS)
+        # https://askubuntu.com/questions/235533/how-to-set-keyboard-layout-for-a-macbook-pro
+        # dpkg-reconfigure keyboard-configuration
+        # -> MacBook / MacBookPro (Intl)
+        # -> French
+        # -> French (again)
+        # -> Right Alt (AltGr)
+        # -> No Compose Key
+##
+# Conf network here!
+#   register: language
+
+# - name: Reboot immediately if there was a change.
+#   shell: "sleep 5 && reboot"
+#   async: 1
+#   poll: 0
+#   when: task_result is changed
+
+# - name: Wait for the reboot to complete if there was a change.
+#   wait_for_connection:
+#     connect_timeout: 20
+#     sleep: 5
+#     delay: 5
+#     timeout: 300
+#   when: task_result is changed

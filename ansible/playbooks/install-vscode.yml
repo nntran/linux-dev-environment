@@ -1,0 +1,27 @@
+# Playbook for installing Visual Studio Code editor on all hosts
+# File name: install-svcode.yml
+# https://fedoramagazine.org/add-power-terminal-powerline/
+---
+- name: Install Visual Studio Code on all hosts
+  hosts: all # Change this setting to you hosts or group specified in /etc/ansible/hosts
+  become: true
+  # remote_user: root
+  # Thi variables file is used
+  vars_files:
+    - ../vars.yml
+  tasks:
+    - name: Add VS Code key
+      apt_key:
+        url: "{{ vm.packages.vscode.mirror }}/keys/microsoft.asc"
+        state: present
+
+    - name: Add VS Code repository
+      apt_repository:
+        repo: "deb [arch=amd64] {{ vm.packages.vscode.mirror }}/repos/vscode stable main"
+        filename: vscode
+        state: present
+
+    - name: Install VS Code
+      apt:
+        name: "code{{ (vm.packages.vscode.version | length > 0) | ternary('=' + vm.packages.vscode.version, '') }}"
+        state: present

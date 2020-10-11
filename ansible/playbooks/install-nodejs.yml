@@ -1,0 +1,30 @@
+# Playbook for setting nodejs on all hosts
+# File name: install-nodejs.yml
+---
+- name: Install NodeJS on all hosts
+  hosts: all
+  become: yes
+
+  # Thi variables file is used
+  vars_files:
+    - ../vars.yml
+
+  tasks:
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_key_module.html
+    - name: Add apt key for nodesource
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        validate_certs: no
+        state: present
+
+    # - name: Add repository for nodesource
+    #   apt_repository:
+    #     repo: "deb https://deb.nodesource.com/node_{{ vm.packages.nodejs.version }}.x {{ ansible_distribution_release }} main"
+    #     state: present
+    #     update_cache: yes
+
+    - name: Install NodeJS v.{{ vm.packages.nodejs.version }}.x
+      apt:
+        name: nodejs
+        state: present
+        update_cache: yes

@@ -1,0 +1,57 @@
+---
+# VM configuration variables
+vm:
+  groups:
+    - name: tran
+      gid: 1100
+    - name: devops
+      gid: 1200
+  users:
+    - name: ntran
+      comment: Nhi TRAN
+      uid: 1101
+      password: $6$sk.NgiIbn9Mh1FC9$i5Epdv819Qg/Ttx40XwHvhetoPlN9z3sMe/sRBgQ7gdG32Kghu.KqTE8uYro4fbu38XwKB7Mtc1F3IYBra23Q/
+      # primary group
+      group: tran
+      groups: docker,devops
+      shell: /bin/bash
+      generate_ssh_key: true
+  locale:
+    language:
+      name: french
+      code: fr
+    encoding: utf-8
+  packages:
+    containerd:
+      version: 1.2.13-2
+    docker:
+      version: 19.03.11
+    java:
+      version: 8
+    maven:
+      version: 3.6.3
+    nodejs:
+      version: 14
+    vscode:
+      # Mirror server for fetching the public keys and the Visual Studio Code
+      # installation package. The URL may include directories. The URL must not end
+      # with a trailing slash.
+      mirror: https://packages.microsoft.com
+      # Build (either 'stable' or 'insiders') https://code.visualstudio.com/insiders/
+      # Ubuntu only (code-insiders isn't in Microsoft's RPM repo)
+      build: stable
+      # Visual Studio Code version number (defaults to the latest version)
+      version: ""
+    desktop:
+      name:
+        #- openssh-server
+        - ubuntu-desktop
+        #- ubuntu-mate-core
+        #- ubuntu-mate-desktop
+        #- xfce4
+    virtualbox:
+      version: auto
+      remove: false
+      iso:
+        src: ../binaries/virtalbox/VBoxGuestAdditions.iso
+        dest: /root/VBoxGuestAdditions.iso

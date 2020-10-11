@@ -1,0 +1,25 @@
+{
+  "servers": [
+    {
+      "nameservers": "8.8.8.8",
+      "gateway": "",
+      "nodes": [
+        {
+          "name": "vm-dev-ubuntu",
+          "ip": "192.168.100.101",
+          "memory": "4096",
+          "cpus": "4",
+          "disk": "128",
+          "box": {
+            "name": "generic/ubuntu1804",
+            "version": "3.0.28"
+          },
+          "user": {
+            "name": "vagrant",
+            "password": "vagrant"
+          }
+        }
+      ]
+    }
+  ]
+}
