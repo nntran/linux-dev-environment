@@ -1,22 +1,10 @@
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
-  "default-address-pools": [
-    {
-      "base": "172.21.0.0/16",
-      "size": 24
-    }
-  ],
   "registry-mirrors": [],
-  "insecure-registries": [
-    "172.17.2.1:7777",
-    "nexus.systel.local:7777",
-    "nexus.systel.local:7778",
-    "nexus.systel.local:7779"
-  ],
+  "insecure-registries": ["nexus.example.lan"],
   "debug": true,
   "experimental": false,
-  "bip": "172.15.0.1/16",
-  "dns": ["172.18.0.5", "172.18.0.6", "8.8.8.8"],
+  "dns": ["8.8.8.8"],
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "10m",
