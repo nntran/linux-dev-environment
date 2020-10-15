@@ -19,6 +19,7 @@
           - curl
         state: present
         update_cache: yes
+        install-recommends: no
 
     - name: Install compilers
       apt:

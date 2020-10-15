@@ -26,6 +26,8 @@ vm:
       version: 1.2.13-2
     docker:
       version: 19.03.11
+    kubernetes:
+      version: 1.18.8-00
     java:
       version: 8
     maven:
@@ -55,3 +57,12 @@ vm:
       iso:
         src: ../binaries/virtalbox/VBoxGuestAdditions.iso
         dest: /root/VBoxGuestAdditions.iso
+    # Gluster configuration.
+    gluster:
+      version: 7
+      mount_dir: /mnt
+      brick_dir: /gluster/bricks
+      brick_name: gfs
+      # Uncomment this if u use external device storage
+      device: /dev/sdb
+      fstype: xfs

@@ -155,13 +155,13 @@ Vagrant.configure(2) do |config|
 
                 # n.vm.provision "file", source: "config", destination: sync_dir + '/config'
 
-                # # Create user
+                # # Add user
                 # user = node['user']
                 # user_name = user['name']
                 # user_password = user['password']
                 # user_home = '/home/' + user['name']
                 # n.vm.provision "shell" do |shell|
-                #     shell.path = "scripts/create-user.sh"
+                #     shell.path = "scripts/add-user.sh"
                 #     shell.args = [user_name, user_password, user_home]
                 # end
 

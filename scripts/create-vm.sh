@@ -68,6 +68,9 @@ ansible-playbook playbooks/upgrade-packages.yml -i inventory.yml
 # Install Docker
 ansible-playbook playbooks/install-docker.yml -i inventory.yml
 
+# Install kubernetes
+ansible-playbook playbooks/install-kubernetes.yml -i inventory.yml
+
 if [[ "$env_type" == front ]]; then
     # Front development environmment
     # Install nodejs
@@ -88,7 +91,7 @@ if [[ "$env_type" == devops ]]; then
     ansible-playbook playbooks/install-ansible.yml -i inventory.yml
 fi
 
-if [ $desktop ]; then
+if [[ "$desktop" == true ]]; then
 
     # Install desktop
     ansible-playbook playbooks/install-desktop.yml -i inventory.yml

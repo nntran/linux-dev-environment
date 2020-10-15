@@ -1,6 +1,6 @@
 #!/bin/bash -eux
 
-# Script for installing common tools
+# Script for adding a new user account
 #
 # Parameters :
 # - user : User name

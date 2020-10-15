@@ -36,6 +36,14 @@
       with_items: "{{ vm.users }}"
       when: vm.users is defined
 
+    - name: sudo without password for wheel group
+      copy:
+        content: "%{{ item.name }} ALL=(ALL:ALL) NOPASSWD:ALL"
+        dest: "/etc/sudoers.d/{{ item.name }}"
+        mode: 0440
+      with_items: "{{ vm.users }}"
+      when: vm.users is defined
+
     # Install locales
     - name: Install locales
       apt:

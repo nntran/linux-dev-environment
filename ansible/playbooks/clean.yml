@@ -14,14 +14,34 @@
       apt:
         autoremove: yes
 
+    - name: Get the current username
+      action: command whoami
+      register: username
+
+    - debug: var=username
+
+    # Remove the network vagrant configuration
+    - name: Remove the 50-vagrant.yaml network configuration
+      file:
+        path: "/etc/netplan/50-vagrant.yaml"
+        state: absent
+      ignore_errors: yes
+      #when: (username.stdout == "vagrant")
+
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
     - name: Remove the vagrant user
-      become: true
-      #become_method: su
+      # https://docs.ansible.com/ansible/2.3/become.html#:~:text=Ansible%20allows%20you%20to%20'become,%2C%20dzdo%20%2C%20ksu%20and%20others.
+      # become: true
+      become_method: su
       become_user: ntran
       #become_flags: "-s /bin/sh"
       user:
         name: vagrant
         state: absent
         remove: yes
-      # https://docs.ansible.com/ansible/2.3/become.html#:~:text=Ansible%20allows%20you%20to%20'become,%2C%20dzdo%20%2C%20ksu%20and%20others.
+      ignore_errors: yes
+      #when: (username.stdout == "vagrant")
+
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/reboot_module.html
+    - name: Reboot the machine now
+      reboot:
