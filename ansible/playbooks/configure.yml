@@ -29,7 +29,7 @@
         group: "{{ item.group }}"
         groups: "{{ item.groups }}"
         shell: "{{ item.shell }}"
-        generate_ssh_key: "{{ item.generate_ssh_key }}"
+        # generate_ssh_key: "{{ item.generate_ssh_key }}"
         # add the user to the groups specified in groups
         # append: true
         state: present

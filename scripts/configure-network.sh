@@ -17,6 +17,8 @@ nameservers=$2
 # Gateway
 gateway=$3
 
+apt-get install --no-install-recommends -y net-tools
+
 echo "=== Configuring dns..."
 # Hosts running a local caching nameserver
 if [ -n "$nameservers" ]; then
@@ -53,10 +55,10 @@ os=$( (grep -Po '(?<=DISTRIB_ID=).*' /etc/lsb-release))
 version=$( (grep -Po '(?<=DISTRIB_RELEASE=).*' /etc/lsb-release))
 echo "=== $os $version"
 
-# if [[ "$os" == Ubuntu ]] && [[ "$version" == 18.* ]]; then
-if [[ "$os" == Ubuntu ]]; then
+# if [ "$os" == Ubuntu ] && [ "$version" == 18.* ]; then
+if [ "$os" == Ubuntu ]; then
 
-    # if [[ -f "$resolv_conf_file" ]]
+    # if [ -f "$resolv_conf_file" ]
     # then
     #     apt-get install --no-install-recommends -y resolvconf
     #     cat $resolv_conf_file > /etc/resolvconf/resolv.conf.d/head
@@ -84,7 +86,7 @@ if [[ "$os" == Ubuntu ]]; then
     # configure first interface (eth0)
     # 01-netcfg.yaml
     netcfg01_file=/etc/netplan/01-netcfg.yaml
-    if [[ -f "$netcfg01_file" ]]; then
+    if [ -f "$netcfg01_file" ]; then
         # Set nameservers
         # if [ -n "$nameservers" ]; then
         #     echo "      nameservers:" >> $netcfg01_file
@@ -93,33 +95,33 @@ if [[ "$os" == Ubuntu ]]; then
         more $netcfg01_file
     fi
 
-    # configure second interface (eth1)
-    # 50-vagrant.yaml
-    netcfg50_file=/etc/netplan/50-vagrant.yaml
-    if [[ -f "$netcfg50_file" ]]; then
+    if [ "$provider" == esxi ] || [ "$provider" == nutanix ]; then
 
-        # Set default gateway
-        if [ -n "$gateway" ]; then
-            echo "      #gateway4: $gateway" >>$netcfg50_file
-            echo "      routes:" >>$netcfg50_file
-            echo "        - to: 0.0.0.0/0" >>$netcfg50_file
-            echo "          via: $gateway" >>$netcfg50_file
-            echo "          metric: 100" >>$netcfg50_file
+        # configure second interface (eth1)
+        # 50-vagrant.yaml
+        netcfg50_file=/etc/netplan/50-vagrant.yaml
+        if [ -f "$netcfg50_file" ]; then
+
+            # Set default gateway
+            if [ -n "$gateway" ]; then
+                echo "      #gateway4: $gateway" >>$netcfg50_file
+                echo "      routes:" >>$netcfg50_file
+                echo "        - to: 0.0.0.0/0" >>$netcfg50_file
+                echo "          via: $gateway" >>$netcfg50_file
+                echo "          metric: 100" >>$netcfg50_file
+            fi
+
+            # Set nameservers
+            if [ -n "$nameservers" ]; then
+                echo "      nameservers:" >>$netcfg50_file
+                echo "        addresses: [$nameservers]" >>$netcfg50_file
+            fi
+
+            more $netcfg50_file
         fi
 
-        # Set nameservers
-        if [ -n "$nameservers" ]; then
-            echo "      nameservers:" >>$netcfg50_file
-            echo "        addresses: [$nameservers]" >>$netcfg50_file
-        fi
-
-        more $netcfg50_file
-    fi
-
-    # apply network config
-    netplan apply
-
-    if [[ "$provider" == esxi ]] || [[ "$provider" == nutanix ]]; then
+        # apply network config
+        netplan apply
 
         echo "=== Deleting interface $last_eth_name (vagrant)..."
 

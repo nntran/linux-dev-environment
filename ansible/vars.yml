@@ -15,7 +15,7 @@ vm:
       group: tran
       groups: docker,devops
       shell: /bin/bash
-      generate_ssh_key: true
+      # generate_ssh_key: true
   locale:
     language:
       name: french

@@ -63,7 +63,7 @@ ansible-playbook playbooks/check-hosts.yml -i inventory.yml
 ansible-playbook playbooks/install-common.yml -i inventory.yml
 
 # Update packages
-ansible-playbook playbooks/upgrade-packages.yml -i inventory.yml
+#ansible-playbook playbooks/upgrade-packages.yml -i inventory.yml
 
 # Install Docker
 ansible-playbook playbooks/install-docker.yml -i inventory.yml
