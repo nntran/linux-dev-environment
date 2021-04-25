@@ -17,6 +17,7 @@
           - jshon
           - gnupg2
           - curl
+          - neovim
         state: present
         update_cache: yes
         install-recommends: no

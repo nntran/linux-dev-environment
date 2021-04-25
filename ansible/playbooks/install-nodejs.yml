@@ -25,6 +25,8 @@
 
     - name: Install NodeJS v.{{ vm.packages.nodejs.version }}.x
       apt:
-        name: nodejs
+        name: 
+          - nodejs
+          - npm
         state: present
         update_cache: yes

@@ -20,37 +20,69 @@
           - python3
         state: latest
 
-    - name: Add Powerline to bashrc global config file
-      blockinfile:
-        path: /etc/bash.bashrc
-        #path: "{{ vm.user.home }}/.bashrc"
-        block: |
-          if [ -f `which powerline-daemon` ]; then
-            powerline-daemon -q
-              POWERLINE_BASH_CONTINUATION=1
-                POWERLINE_BASH_SELECT=1
-                  . /usr/share/powerline/bash/powerline.sh
-          fi
+    # - name: Add Powerline to bashrc global config file
+    #   blockinfile:
+    #     path: /etc/bash.bashrc
+    #     #path: "{{ vm.user.home }}/.bashrc"
+    #     block: |
+    #       if [ -f `which powerline-daemon` ]; then
+    #         powerline-daemon -q
+    #           POWERLINE_BASH_CONTINUATION=1
+    #             POWERLINE_BASH_SELECT=1
+    #               . /usr/share/powerline/bash/powerline.sh
+    #       fi
 
-    - name: Add Powerline to tmux global config file
-      blockinfile:
-        path: /etc/tmux.conf
-        create: yes
-        block: |
-          source "/usr/share/tmux/powerline.conf"
+    # - name: Add Powerline to tmux global config file
+    #   blockinfile:
+    #     path: /etc/tmux.conf
+    #     create: yes
+    #     block: |
+    #       source "/usr/share/tmux/powerline.conf"
 
-    - name: Add Powerline to vim global config file
-      blockinfile:
-        path: /etc/vimrc
-        create: yes
-        marker: '" {mark}'
-        marker_begin: "BEGIN ANSIBLE MANAGED BLOCK"
-        marker_end: "END ANSIBLE MANAGED BLOCK"
-        block: |
-          python3 from powerline.vim import setup as powerline_setup
-          python3 powerline_setup()
-          python3 del powerline_setup
-          set laststatus=2 " Always display the statusline in all windows
-          set showtabline=2 " Always display the tabline, even if there is only one tab
-          set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
-          set t_Co=256
+    # - name: Add Powerline to vim global config file
+    #   blockinfile:
+    #     path: /etc/vimrc
+    #     create: yes
+    #     marker: '" {mark}'
+    #     marker_begin: "BEGIN ANSIBLE MANAGED BLOCK"
+    #     marker_end: "END ANSIBLE MANAGED BLOCK"
+    #     block: |
+    #       python3 from powerline.vim import setup as powerline_setup
+    #       python3 powerline_setup()
+    #       python3 del powerline_setup
+    #       set laststatus=2 " Always display the statusline in all windows
+    #       set showtabline=2 " Always display the tabline, even if there is only one tab
+    #       set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+    #       set t_Co=256
+
+    # Configure terminal
+    - name: Install ZSH
+      apt:
+        name: zsh
+        state: present
+        update_cache: yes
+
+    - name: Install Oh-My-Zsh
+      shell: |
+          wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+          install.sh
+          rm install.sh
+
+    - name: Install Oh-My-Zsh
+      shell: |
+          git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+          git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+          git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+          git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
+      ignore_errors: yes
+
+    # - name: Install Oh-My-Zsh Nerd Fonts
+    #   shell: |
+    #       wget https://github.com/source-foundry/Hack/releases/download/v3.003/Hack-v3.003-ttf.zip
+    #       unzip Hack-v3.003-ttf.zip
+    #       cp ttf/* /usr/share/fonts/
+    #       cp ttf/* /usr/local/share/fonts/
+    #       fc-cache -f -v
+    #       rm Hack-v3.003-ttf.zip
+
+    
