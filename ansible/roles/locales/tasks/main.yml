@@ -1,0 +1,38 @@
+---
+# Install locales
+- name: Install locales
+  apt:
+    name: locales
+    state: present
+    update_cache: yes
+
+- name: Set up locale with {{ language.code | lower }}_{{ language.code | upper }} {{ encoding | upper }}
+  blockinfile:
+    path: /etc/gen
+    # fr_FR UTF-8
+    block: |
+      {{ language.code | lower }}_{{ language.code | upper }} {{ encoding | upper }}
+
+# Enable locales in /etc/gen
+# locale-gen fr_FR.UTF-8
+# localectl set-locale LANG=fr_FR.UTF-8 LC_ALL=fr_FR.UTF-8
+- name: Enable locales in /etc/gen
+  shell: "locale-gen {{ language.code | lower }}_{{ language.code | upper }}.{{ encoding | upper }} && localectl set-locale LANG={{ language.code | lower }}_{{ language.code | upper }}.{{ encoding | upper }}"
+
+# Set locale, this generates the /etc/default/locale file
+# locale-gen fr_FR.UTF-8
+# localectl set-locale LANG=fr_FR.UTF-8
+- name: Set locale, this generates the /etc/default/locale file
+  shell: "update-locale LANG={{ language.code | lower }}_{{ language.code | upper }}.{{ encoding | upper }}"
+# - name: Ensure the locale {{ language.code }}.{{ encoding }} exists
+#   locale_gen:
+#     name: "{{ language.code }}.{{ encoding }}"
+#     state: present
+# # Enable locales in /etc/gen
+# - name: Set as default locale
+#   command: localectl set-locale LANG={{ language.code }}.{{ encoding }} LC_ALL={{ language.code }}.{{ encoding }}
+# # Set locale, this generates the /etc/default/locale file
+# - name: Set locale, this generates the /etc/default/locale file
+#   command: update-locale LANG={{ language.code }}.{{ encoding }}
+# # Reconfigure, the current system language settings
+# dpkg-reconfigure locales

@@ -1,0 +1,52 @@
+---
+- name: Check docker exists
+  stat:
+    path: /var/lib/docker
+  register: docker_dir
+
+- debug: var=docker_dir
+
+- name: Check current docker version
+  shell: |
+    docker version | grep Version | head -n 1 | awk '{print $2}'
+  register: current_version
+  when: docker_dir.stat.exists
+
+- debug: var=current_version
+  when: docker_dir.stat.exists
+
+- name: Unstall docker {{ current_version.stdout }}
+  include_tasks: uninstall.yml
+  when: docker_dir.stat.exists
+  tags:
+    - install
+    - uninstall
+
+- name: Install docker {{ version }}
+  include_tasks: install.yml
+  tags:
+    - install
+
+# Copy the daemon.json from local to remote
+- name: Create daemon.json config file
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  notify:
+    - docker status
+  register: cmdline_modified
+  tags:
+    - install
+
+- name: Reboot host
+  reboot:
+  when: cmdline_modified.changed
+  tags:
+    - install
+
+- name: Install docker {{ version }}
+  include_tasks: swarm.yml
+  when: init_swarm
+  tags:
+    - install

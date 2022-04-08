@@ -1,0 +1,47 @@
+---
+# Ansible role for setting powerline on all hosts
+# File name: main.yml
+# https://fedoramagazine.org/add-power-terminal-powerline/
+
+- name: Make sure powerline is installed
+  apt:
+    name:
+      - powerline
+      # - vim-powerline
+      # - tmux-powerline
+      - python3
+    state: latest
+# - name: Add Powerline to bashrc global config file
+#   blockinfile:
+#     path: /etc/bash.bashrc
+#     #path: "{{ vm.user.home }}/.bashrc"
+#     block: |
+#       if [ -f `which powerline-daemon` ]; then
+#         powerline-daemon -q
+#           POWERLINE_BASH_CONTINUATION=1
+#             POWERLINE_BASH_SELECT=1
+#               . /usr/share/powerline/bash/powerline.sh
+#       fi
+
+# - name: Add Powerline to tmux global config file
+#   blockinfile:
+#     path: /etc/tmux.conf
+#     create: yes
+#     block: |
+#       source "/usr/share/tmux/powerline.conf"
+
+# - name: Add Powerline to vim global config file
+#   blockinfile:
+#     path: /etc/vimrc
+#     create: yes
+#     marker: '" {mark}'
+#     marker_begin: "BEGIN ANSIBLE MANAGED BLOCK"
+#     marker_end: "END ANSIBLE MANAGED BLOCK"
+#     block: |
+#       python3 from powerline.vim import setup as powerline_setup
+#       python3 powerline_setup()
+#       python3 del powerline_setup
+#       set laststatus=2 " Always display the statusline in all windows
+#       set showtabline=2 " Always display the tabline, even if there is only one tab
+#       set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+#       set t_Co=256

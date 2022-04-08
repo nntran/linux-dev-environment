@@ -1,0 +1,9 @@
+---
+- import_tasks: groups.yml
+  when: groups_def is defined
+
+- import_tasks: users.yml
+  when: users_def is defined
+
+- import_tasks: remove-vagrant-user.yml
+  when: remove_vagrant_user

@@ -1,0 +1,9 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html
+- debug: var=groups
+- name: Add groups
+  group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid }}"
+    state: present
+  with_items: "{{ groups_def }}"

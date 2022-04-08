@@ -1,0 +1,10 @@
+- name: Install virtualbox additions
+  apt:
+    name:
+      - virtualbox-guest-additions-iso
+      - virtualbox-guest-dkms
+      - virtualbox-guest-source
+      - virtualbox-guest-utils
+      - virtualbox-guest-x11
+    state: present
+    update_cache: yes

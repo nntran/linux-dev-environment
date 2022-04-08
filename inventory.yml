@@ -1,0 +1,21 @@
+all:
+  vars:
+    ansible_become: true
+    ansible_become_user: root
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_connection: ssh
+    ansible_user: vagrant
+    ansible_ssh_pass: vagrant
+  hosts:
+    vm-dev-ubuntu:
+      ansible_host: 10.11.13.40
+      vcpu: 2
+      memory: 4096
+      disk: 20
+      # https://app.vagrantup.com/ubuntu
+      vagrant_box:
+        name: generic/ubuntu2004
+        version: 3.0.28
+      # public network
+      network:
+        bridge: "en0: Wi-Fi (AirPort)"

@@ -1,0 +1,28 @@
+---
+- hosts: all
+  tasks:
+    - name: Wait for automatic system updates
+      shell: while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 1; done;
+
+    - name: Upgrade the OS
+      apt:
+        # values: dist|yes
+        upgrade: dist
+        update_cache: yes
+        cache_valid_time: 0
+        # Pass options to dpkg on run
+        dpkg_options: "force-confold,force-confdef"
+
+    - name: Check if a reboot is needed
+      stat: path=/var/run/reboot-required get_md5=no
+      register: reboot_required_file
+
+    - name: Reboot the box if kernel updated
+      reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists

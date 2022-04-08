@@ -1,0 +1,16 @@
+---
+common_packages:
+  - vim
+  - neovim
+  - nano
+  - ack-grep
+  - net-tools
+  - jshon
+  - gnupg2
+  - curl
+  - wget
+
+compiler_packages:
+  - gcc
+  - g++
+  - make

@@ -1,0 +1,15 @@
+- name: Add VS Code key
+  apt_key:
+    url: "{{ mirror }}/keys/microsoft.asc"
+    state: present
+
+- name: Add VS Code repository
+  apt_repository:
+    repo: "deb [arch=amd64] {{ mirror }}/repos/vscode stable main"
+    filename: vscode
+    state: present
+
+- name: Install VS Code
+  apt:
+    name: "code{{ (version | length > 0) | ternary('=' + version, '') }}"
+    state: present

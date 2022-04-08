@@ -1,0 +1,44 @@
+---
+# Environment for backend development
+- hosts: all
+  roles:
+    - common
+    - role: docker
+      vars:
+        version: 20.10.14
+        containerd: 1.5.11
+        init_swarm: true
+    - role: java
+      vars:
+        version: 8
+    - role: maven
+      vars:
+        version: 3.6.3
+    - role: nodejs
+      vars:
+        version: 15.x
+    - role: desktop
+      vars:
+        desktop: ubuntu-desktop
+    - role: virtualbox-guest
+    - role: powerline
+    - role: oh-my-zsh
+    # - role: locales
+    - role: keyboard
+    - role: users
+      vars:
+        users_def:
+          - name: ntran
+            comment: Nhi TRAN
+            uid: 1101
+            password: $6$sk.NgiIbn9Mh1FC9$i5Epdv819Qg/Ttx40XwHvhetoPlN9z3sMe/sRBgQ7gdG32Kghu.KqTE8uYro4fbu38XwKB7Mtc1F3IYBra23Q/
+            # primary group
+            group: tran
+            groups: docker
+            shell: /bin/bash
+            # generate_ssh_key: true
+        groups_def:
+          - name: tran
+            gid: 1100
+  tags:
+    - backend

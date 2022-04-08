@@ -1,0 +1,18 @@
+---
+# https://serverfault.com/questions/539911/setting-debconf-selections-for-keyboard-configuration-fails-layout-ends-up-as
+- name: Set up keyboard
+  apt:
+    name:
+      - console-data
+      - console-setup
+      - keyboard-configuration
+    state: present
+    update_cache: yes
+    # Do this manually after reboot (for MacOS)
+    # https://askubuntu.com/questions/235533/how-to-set-keyboard-layout-for-a-macbook-pro
+    # dpkg-reconfigure keyboard-configuration
+    # -> MacBook / MacBookPro (Intl)
+    # -> French
+    # -> French (again)
+    # -> Right Alt (AltGr)
+    # -> No Compose Key

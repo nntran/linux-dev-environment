@@ -1,0 +1,22 @@
+---
+- name: Update apt repos
+  apt:
+    update_cache: yes
+
+- name: Install common packages
+  apt:
+    name: "{{ common_packages }}"
+    state: present
+    install-recommends: no
+
+- name: Install compilers
+  apt:
+    name: "{{ compiler_packages }}"
+    state: present
+    install-recommends: no
+
+- name: Install Git
+  apt:
+    name: git
+    state: present
+    # update_cache: yes

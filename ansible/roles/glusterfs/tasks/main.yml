@@ -1,0 +1,77 @@
+---
+# Playbook for setting GlusterFS on all nodes of the cluster
+# https://docs.gluster.org/en/latest/Quick-Start-Guide/Architecture/
+# https://docs.gluster.org/en/latest/Install-Guide/Install/
+# File name: install-glusterfs.yml
+
+# - name: Adding apt repository for GlusterFS
+#   apt_repository:
+#     repo: ppa:gluster/glusterfs-{{ version }}
+#     state: present
+
+- name: Install GlusterFS and dependencies
+  apt:
+    name:
+      - glusterfs-server
+      - glusterfs-client
+    state: present
+    update_cache: yes
+
+# Generate join command for worker
+- name: Enable and start GlusterFS
+  shell: |
+    # automatically start glusterfs on boot 
+    systemctl enable glusterd
+    # start glusterfs right now
+    systemctl start glusterd 
+    # Should show status active
+    systemctl status glusterd
+
+# Create filesystem if define
+# https://stackoverflow.com/questions/55511770/detect-and-mount-filesystem-in-ansible
+- name: Create a {{ fstype }} filesystem on {{ device }} and check disk blocks
+  when: gluster.device is defined
+  filesystem:
+    fstype: "{{ fstype }}"
+    dev: "{{ device }}"
+    force: yes
+    # opts: -cc
+
+- name: Ensure Gluster brick and mount directories exist.
+  file: "path={{ item }} state=directory mode=0775"
+  with_items:
+    - "{{ brick_dir }}"
+    - "{{ mount_dir }}"
+
+- name: Set fact list of hosts
+  set_fact: host_item="{{ item }}"
+  with_inventory_hostnames:
+    - all
+  register: hosts_list
+
+- name: Make a list of hosts
+  set_fact: cluster_hosts="{{ hosts_list.results | map(attribute='ansible_facts.host_item') | list }}"
+
+# https://docs.ansible.com/ansible/latest/modules/gluster_volume_module.html
+- name: Create Gluster volume.
+  gluster_volume:
+    state: present
+    name: "{{ brick_name }}"
+    brick: "{{ brick_dir }}"
+    replicas: "{{ cluster_hosts | length }}"
+    cluster:
+      "{{ cluster_hosts }}"
+      # - swarm-manager-01
+      # - swarm-worker-01
+      # - swarm-worker-02
+    host: "{{ inventory_hostname }}"
+    force: yes
+  run_once: true
+
+- name: Ensure Gluster volume is mounted.
+  mount:
+    name: "{{ mount_dir }}"
+    src: "{{ inventory_hostname }}:/{{ brick_name }}"
+    fstype: glusterfs
+    opts: "defaults,_netdev"
+    state: mounted

@@ -1,0 +1,14 @@
+---
+- name: Download Apache Maven
+  get_url: url=https://mirror.ibcp.fr/pub/apache/maven/maven-3/{{ version }}/binaries/apache-maven-{{ version }}-bin.tar.gz dest=/tmp/apache-maven-{{ version }}-bin.tar.gz
+
+- name: Untar Maven
+  shell: chdir=/tmp creates=/opt/apache-maven-{{ version }} tar -zxf apache-maven-{{ version }}-bin.tar.gz -C /opt
+
+- name: Update path for Maven use
+  blockinfile:
+    #path: /etc/bash.bashrc
+    path: "/home/{{ansible_user}}/.bashrc"
+    create: yes
+    block: |
+      export PATH=$PATH:/opt/apache-maven-{{ version }}/bin

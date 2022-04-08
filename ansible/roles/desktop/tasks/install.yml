@@ -1,0 +1,39 @@
+---
+# Install desktop
+- name: Install desktop {{ desktop }}
+  apt:
+    name: "{{ desktop }}"
+    state: present
+  when: desktop is defined
+
+- shell: "check-language-support -l fr"
+  register: languages
+  when: vm.packages.desktop is defined
+
+- debug:
+    msg: "{{ languages.stdout }}"
+  when: vm.packages.desktop is defined
+
+# Install language support
+- name: Install language support for desktop
+  apt:
+    name:
+      - language-pack-{{ vm.locale.language.code | lower }}
+      - language-pack-gnome-{{ vm.locale.language.code | lower }}
+      - language-pack-{{ vm.locale.language.code | lower }}-base
+      - language-pack-gnome-{{ vm.locale.language.code | lower }}-base
+      - firefox-locale-{{ vm.locale.language.code | lower }}
+      - gnome-getting-started-docs-{{ vm.locale.language.code | lower }}
+      - gnome-user-docs-{{ vm.locale.language.code | lower }}
+      - hunspell-{{ vm.locale.language.code | lower }}
+      - hyphen-{{ vm.locale.language.code | lower }}
+      - language-pack-{{ vm.locale.language.code | lower }}
+      - language-pack-gnome-{{ vm.locale.language.code | lower }}
+      - libreoffice-help-{{ vm.locale.language.code | lower }}
+      - libreoffice-l10n-{{ vm.locale.language.code | lower }}
+      - mythes-{{ vm.locale.language.code | lower }}
+      - thunderbird-locale-{{ vm.locale.language.code | lower }}
+      - w{{ vm.locale.language.name }}
+    state: present
+    update_cache: yes
+  when: vm.packages.desktop is defined

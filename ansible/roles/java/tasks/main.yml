@@ -1,0 +1,56 @@
+---
+# Ansible role for installing Java and dependencies on all hosts
+# File name: main.yml
+
+- name: Install dependencies
+  apt: name={{item}} state=latest
+  with_items:
+    - software-properties-common
+    - dirmngr
+
+- name: Install add-apt-repostory
+  apt: name=software-properties-common state=latest
+
+- name: Add Oracle Java Repository
+  apt_repository:
+    repo: deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
+    state: present
+
+- name: Add an apt key by id from a keyserver
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: EEA14886
+
+- name: Accept Java {{ version }} License
+  debconf: name='oracle-java{{ version }}-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+
+- name: Update cache and ignore errors in case of problems
+  apt: update_cache=yes
+  ignore_errors: yes
+
+- name: Purge java {{ version }} installer - to avoid problems if installation is repeated
+  apt:
+    name: oracle-java{{ version }}-installer
+    state: absent
+
+- name: Install Oracle Java {{ version }}
+  apt: name={{item}} state=latest
+  with_items:
+    - ca-certificates
+    - oracle-java{{ version }}-installer
+    - oracle-java{{ version }}-set-default
+# - name: Install add-apt-repostory
+#   apt: name=software-properties-common state=latest
+# - name: Add Oracle Java Repository
+#   apt_repository: repo='ppa:webupd8team/java'
+# - name: Accept Java {{ version }} License
+#   debconf: name='oracle-java{{ version }}-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+# - name: Install Oracle Java {{ version }}
+#   apt:
+#     name: "{{ java }}"
+#     state: latest
+#   vars:
+#     java:
+#       - oracle-java{{ version }}-installer
+#       - ca-certificates
+#       - oracle-java8-set-default

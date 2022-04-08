@@ -1,0 +1,8 @@
+---
+# Locales
+language:
+  name: french
+  code: fr
+
+# Encoding
+encoding: utf-8

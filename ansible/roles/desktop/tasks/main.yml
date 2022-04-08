@@ -1,0 +1,21 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
+- name: List all available desktops
+  command: tasksel --list-tasks
+
+- name: Install desktop {{ desktop }}
+  include_tasks: install.yml
+  # when: current_version.stdout != version
+  when: desktop is defined
+  tags:
+    - install
+
+# Install X2GO
+- name: Install X2Go server & client
+  apt:
+    name:
+      - x2goserver
+      - x2goserver-xsession
+      - x2goclient
+    state: present
+  when: desktop is defined

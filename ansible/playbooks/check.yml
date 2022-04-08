@@ -1,0 +1,43 @@
+# Playbook used to ping all VMs
+# File name: check.yml
+---
+- hosts: all
+  tasks:
+    #- debug: var=ansible_facts
+    - debug: var=ansible_os_family
+    - debug: var=ansible_distribution_release
+    - debug: var=ansible_distribution_version
+    - debug: var=ansible_distribution_major_version
+    - debug: var=ansible_python_interpreter
+    - debug: var=ansible_python_version
+    - debug: msg="ansible_user={{ ansible_user }}"
+    - debug: msg="ansible_user_id={{ ansible_user_id }}"
+    - debug: msg="USER={{ lookup('env', 'USER') }}"
+    - debug: msg="ansible_all_ipv4_addresses={{ ansible_all_ipv4_addresses }}"
+    - debug: msg="ansible_default_ipv4.address={{ ansible_default_ipv4.address }}"
+    - debug: msg="ansible_host={{ ansible_host }}"
+    - debug: msg="IPv4 IP (eth0)={{ ansible_facts["eth0"]["ipv4"]["address"] }}"
+    - debug: msg="IPv4 IP (eth0)={{ ansible_facts.eth0.ipv4.address }}"
+
+    - name: Get the current username
+      action: command whoami
+      register: username
+
+    - debug: var=username
+
+    # https://docs.ansible.com/ansible/latest/plugins/lookup/inventory_hostnames.html
+    - name: Show all the hosts in inventory
+      debug:
+        msg: "{{ item }}"
+      with_inventory_hostnames:
+        - all
+
+    - debug:
+        msg: System {{ inventory_hostname }} has uuid {{ ansible_product_uuid }}
+
+    - debug:
+        msg: System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}
+      when: ansible_default_ipv4.gateway is defined
+
+    - debug:
+        msg: "{{ lookup('env', 'PWD') }}"

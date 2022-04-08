@@ -1,0 +1,51 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
+# tasksel --list-tasks
+#register: desktops
+# u kubuntu-live	Kubuntu live CD
+# u lubuntu-live	Lubuntu live CD
+# u ubuntu-budgie-live	Ubuntu Budgie live CD
+# u ubuntu-live	Ubuntu live CD
+# u ubuntu-mate-live	Ubuntu MATE Live CD
+# u ubuntustudio-dvd-live	Ubuntu Studio live DVD
+# u xubuntu-live	Xubuntu live CD
+# u cloud-image	Ubuntu Cloud Image (instance)
+# u dns-server	DNS server
+# u kubuntu-desktop	Kubuntu desktop
+# u lamp-server	LAMP server
+# u lubuntu-desktop	Lubuntu Desktop
+# u mail-server	Mail server
+# u postgresql-server	PostgreSQL database
+# u print-server	Print server
+# u samba-server	Samba file server
+# u ubuntu-budgie-desktop	Ubuntu Budgie desktop
+# u ubuntu-desktop	Ubuntu desktop
+# u ubuntu-desktop-default-languages	Ubuntu desktop default languages
+# u ubuntu-desktop-minimal	Ubuntu minimal desktop
+# u ubuntu-desktop-minimal-default-languages	Ubuntu minimal desktop default languages
+# u ubuntu-mate-core	Ubuntu MATE minimal
+# u ubuntu-mate-desktop	Ubuntu MATE desktop
+# u ubuntustudio-audio	Audio recording and editing suite
+# u ubuntustudio-desktop	Ubuntu Studio desktop
+# u ubuntustudio-desktop-core	Ubuntu Studio minimal DE installation
+# u ubuntustudio-fonts	Large selection of font packages
+# u ubuntustudio-graphics	2D/3D creation and editing suite
+# u ubuntustudio-photography	Photograph touchup and editing suite
+# u ubuntustudio-publishing	Publishing applications
+# u ubuntustudio-video	Video creation and editing suite
+# u xubuntu-core	Xubuntu minimal installation
+# u xubuntu-desktop	Xubuntu desktop
+# i openssh-server	OpenSSH server
+# i server	Basic Ubuntu server
+
+# kubuntu-desktop	Kubuntu desktop ( KDE Desktop )
+# lubuntu-desktop	Lubuntu Desktop ( LXQt desktop )
+# ubuntu-budgie-desktop	Ubuntu Budgie desktop
+# ubuntu-desktop	Ubuntu desktop ( default GNOME )
+# ubuntu-desktop-minimal	Ubuntu minimal desktop ( default GNOME )
+# ubuntu-mate-desktop	Ubuntu MATE desktop
+# ubuntustudio-desktop	Ubuntu Studio desktop ( Xfce-based desktop )
+# ubuntustudio-desktop-core	Ubuntu Studio minimal DE installation ( Xfce-based desktop )
+# xubuntu-desktop	Xubuntu desktop ( Xfce desktop )
+
+desktop: xfce4

@@ -1,0 +1,27 @@
+---
+# Environment for DevOps
+- hosts: all
+  roles:
+    - common
+    - role: docker
+      vars:
+        version: 20.10.14
+        containerd: 1.5.11
+        init_swarm: true
+    - role: users
+      vars:
+        users_def:
+          - name: ntran
+            comment: Nhi TRAN
+            uid: 1101
+            password: $6$sk.NgiIbn9Mh1FC9$i5Epdv819Qg/Ttx40XwHvhetoPlN9z3sMe/sRBgQ7gdG32Kghu.KqTE8uYro4fbu38XwKB7Mtc1F3IYBra23Q/
+            # primary group
+            group: tran
+            groups: docker,devops
+            shell: /bin/bash
+            # generate_ssh_key: true
+        groups_def:
+          - name: tran
+            gid: 1100
+          - name: devops
+            gid: 1200

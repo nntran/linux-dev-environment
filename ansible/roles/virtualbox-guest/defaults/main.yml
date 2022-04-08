@@ -1,0 +1,5 @@
+version: auto
+remove: false
+iso:
+  src: ../binaries/virtalbox/VBoxGuestAdditions.iso
+  dest: /root/VBoxGuestAdditions.iso

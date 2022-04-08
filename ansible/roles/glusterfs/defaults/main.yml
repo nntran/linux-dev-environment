@@ -1,0 +1,9 @@
+---
+# GlusterFS configuration
+version: 7
+mount_dir: /mnt
+brick_dir: /gluster/bricks
+brick_name: gfs
+# Uncomment this if u use external device storage
+device: /dev/sdb
+fstype: xfs
